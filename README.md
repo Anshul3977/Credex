@@ -29,7 +29,7 @@ npm run dev
 ```
 
 ## Deploy
-Deploy to Vercel. Add all env vars from .env.local.example in Vercel dashboard.
+Deployed to Vercel.
 
 ## Decisions
 1. **Next.js App Router over Pages Router** — Server components let us fetch 
