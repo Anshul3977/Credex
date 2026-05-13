@@ -10,10 +10,13 @@ discounted AI infrastructure credits.
 ## Screenshots
 
 ### Input Form
-![Input Form](https://credex-kappa-one.vercel.app)
+![Input Form](./input.png)
+
+### Auditing
+![Auditing](./Auditing.png)
 
 ### Audit Results
-![Audit Results](https://credex-kappa-one.vercel.app)
+![Audit Results](./results.png)
 
 ## Quick Start
 ```bash
