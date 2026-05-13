@@ -1,57 +1,36 @@
-# Cred — AI Tool Spend Auditor
+# SpendLens — AI Spend Audit Tool
 
-Audit your team's AI tool subscriptions. Identify overspend, redundancies, and right-sizing opportunities across Cursor, GitHub Copilot, Claude, ChatGPT, Gemini, Windsurf, and more.
+SpendLens is a free web app for startup founders and engineering managers 
+to audit their AI tool spending, identify overspend, and get actionable 
+recommendations. Built as a lead-generation asset for Credex, which sells 
+discounted AI infrastructure credits.
 
-## Tech Stack
+**Live:** [your-url-here]
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Auth & DB**: Supabase
-- **Email**: Resend
-- **Validation**: Zod + React Hook Form
+## Screenshots
+[Add screenshots or Loom link here]
 
-## Getting Started
-
+## Quick Start
 ```bash
-# Install dependencies
+git clone [repo]
+cd spendlens
 npm install
-
-# Copy environment variables
 cp .env.local.example .env.local
-# Fill in your keys in .env.local
-
-# Run development server
+# Fill in env vars
 npm run dev
-
-# Run tests
-npm run test
-
-# Lint
-npm run lint
 ```
 
-## Project Structure
+## Deploy
+Deploy to Vercel. Add all env vars from .env.local.example in Vercel dashboard.
 
-```
-/app          — Next.js App Router routes
-/components   — Reusable UI components (shadcn/ui)
-/lib          — Audit engine, utilities
-/types        — TypeScript interfaces
-/data         — Pricing data constants
-```
-
-## Audit Engine
-
-The core audit logic lives in `/lib/auditEngine.ts`. It's a **pure function** with no side effects that evaluates your tool stack against 6 rules:
-
-1. **Wrong Plan Size** — Team/Business plan with ≤2 seats
-2. **Overpaying vs Actual** — Invoice exceeds expected cost
-3. **Cheaper Same-Vendor Plan** — Business tier for non-coding use
-4. **Cheaper Alternative Tool** — Cross-tool recommendations
-5. **Credits Opportunity** — Credex discounts for high spenders
-6. **Be Honest** — Validates well-configured setups
-
-## License
-
-Private — All rights reserved.
+## Decisions
+1. **Next.js App Router over Pages Router** — Server components let us fetch 
+   audit data server-side for OG metadata generation without client waterfalls.
+2. **Hardcoded audit rules over AI** — The audit math uses deterministic rules 
+   so results are auditable and defensible. AI is only used for the summary narrative.
+3. **Gemini over Anthropic API** — Gemini 1.5 Flash has a genuinely free tier; 
+   Anthropic requires paid credits. For a free tool, zero marginal cost per audit matters.
+4. **Supabase over raw Postgres** — Built-in auth, instant REST API, and a generous 
+   free tier made it faster to ship than provisioning our own DB on Render.
+5. **nanoid for audit IDs over UUIDs** — Shorter, URL-safe, still collision-resistant 
+   at our scale. Makes shareable URLs cleaner.
