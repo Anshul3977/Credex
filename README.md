@@ -8,7 +8,12 @@ discounted AI infrastructure credits.
 **Live:** [your-url-here]
 
 ## Screenshots
-[Add screenshots or Loom link here]
+
+### Input Form
+![Input Form](https://credex-kappa-one.vercel.app)
+
+### Audit Results
+![Audit Results](https://credex-kappa-one.vercel.app)
 
 ## Quick Start
 ```bash
