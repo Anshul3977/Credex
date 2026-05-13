@@ -169,6 +169,11 @@ export function checkCheaperAlternative(
     useCaseLower.includes('development') ||
     useCaseLower.includes('engineering');
 
+  const isWriting =
+    useCaseLower.includes('writing') ||
+    useCaseLower.includes('content') ||
+    useCaseLower.includes('copy');
+
   // 4a: Copilot Business ($19/seat) for coding with >5 seats → surface Cursor Pro ($20/seat)
   const copilotEntry = entries.find((e) => {
     const plan = getPlanById(e.toolId, e.planId);
@@ -200,7 +205,7 @@ export function checkCheaperAlternative(
     });
   }
 
-  // 4b: ChatGPT Team for coding → surface Claude Team
+  // 4b: ChatGPT Team for coding or writing → surface Claude Team
   const chatgptTeamEntry = entries.find((e) => {
     const plan = getPlanById(e.toolId, e.planId);
     return (
@@ -208,7 +213,7 @@ export function checkCheaperAlternative(
     );
   });
 
-  if (chatgptTeamEntry && isCoding) {
+  if (chatgptTeamEntry && (isCoding || isWriting)) {
     const chatgptPlan = getPlanById(
       chatgptTeamEntry.toolId,
       chatgptTeamEntry.planId,
@@ -219,7 +224,7 @@ export function checkCheaperAlternative(
       toolId: 'chatgpt',
       currentSpend,
       recommendedAction:
-        'Consider Claude Team as an alternative — better long-context performance for coding',
+        'Consider Claude Team as an alternative — better long-context performance for coding and writing',
       recommendedPlan: 'claude-team',
       projectedSpend: chatgptTeamEntry.seats * 30, // Same price
       monthlySavings: 0,
@@ -227,7 +232,7 @@ export function checkCheaperAlternative(
       reasoning:
         `You're on ChatGPT Team at $${chatgptPlan.pricePerSeat}/seat/mo for ${chatgptTeamEntry.seats} seats ` +
         `($${currentSpend}/mo). Claude Team is the same price ($30/seat/mo) but offers significantly better ` +
-        `long-context performance — critical for coding tasks involving large codebases. This is a ` +
+        `long-context performance — critical for tasks involving large documents or codebases. This is a ` +
         `feature recommendation, not a cost-saving one.`,
     });
   }

@@ -184,4 +184,85 @@ describe('Audit Engine', () => {
       }
     });
   });
+  // ──────────────────────────────────────────────────────────────────
+  // New Test 1: Downgrade Copilot Business to Individual for solo dev
+  // ──────────────────────────────────────────────────────────────────
+  it('should recommend downgrading Copilot Business to Individual for a solo developer', () => {
+    const input: UserToolInput = {
+      toolId: 'github-copilot',
+      planId: 'copilot-business',
+      seats: 1,
+      monthlySpend: 19,
+    };
+    const rec = checkWrongPlanSize(input);
+    expect(rec).not.toBeNull();
+    expect(rec!.monthlySavings).toBe(9);
+    expect(rec!.recommendedPlan).toBe('copilot-individual');
+  });
+
+  // ──────────────────────────────────────────────────────────────────
+  // New Test 2: ChatGPT Team for 2-person team (writing) -> Claude Team
+  // ──────────────────────────────────────────────────────────────────
+  it('should flag ChatGPT Team for a 2-person team using it for writing and surface Claude Team as alternative', () => {
+    const entries: UserToolInput[] = [
+      {
+        toolId: 'chatgpt',
+        planId: 'chatgpt-team',
+        seats: 2,
+        monthlySpend: 60,
+      },
+    ];
+    const recs = checkCheaperAlternative(entries, 'writing');
+    expect(recs.length).toBeGreaterThan(0);
+    const hasSwitch = recs.some((r) => r.recommendedAction.match(/Switch|Alternative/i));
+    expect(hasSwitch).toBe(true);
+  });
+
+  // ──────────────────────────────────────────────────────────────────
+  // New Test 3: Do not flag correctly sized individual plan
+  // ──────────────────────────────────────────────────────────────────
+  it('should not flag a correctly sized individual plan', () => {
+    const input: UserToolInput = {
+      toolId: 'claude',
+      planId: 'claude-pro',
+      seats: 1,
+      monthlySpend: 20,
+    };
+    const rec = checkWrongPlanSize(input);
+    expect(rec).toBeNull();
+  });
+
+  // ──────────────────────────────────────────────────────────────────
+  // New Test 4: Calculate correct annual savings for multiple tools
+  // ──────────────────────────────────────────────────────────────────
+  it('should calculate correct annual savings for multiple tools', () => {
+    // Mock the individual check functions or just use the whole engine
+    // We can simulate savings via checkOverpaying
+    const input: AuditInput = {
+      tools: [
+        { toolId: 'cursor', planId: 'cursor-pro', seats: 1, monthlySpend: 70 }, // Overpaying by $50 (should be $20)
+        { toolId: 'claude', planId: 'claude-pro', seats: 1, monthlySpend: 70 }, // Overpaying by $50 (should be $20)
+      ],
+      teamSize: 1,
+      primaryUseCase: 'coding',
+    };
+    const result = runAudit(input);
+    // Overpaying calculation checks: 70 - 20 = 50. Two tools = 100/mo = 1200/yr.
+    // Wait, let's verify if that matches overpaying logic. Yes, checkOverpaying uses monthlySpend - expected.
+    expect(result.totalAnnualSavings).toBe(1200);
+  });
+
+  // ──────────────────────────────────────────────────────────────────
+  // New Test 5: Handle empty tools array gracefully
+  // ──────────────────────────────────────────────────────────────────
+  it('should handle empty tools array gracefully', () => {
+    const input: AuditInput = {
+      tools: [],
+      teamSize: 3,
+      primaryUseCase: 'writing',
+    };
+    expect(() => runAudit(input)).not.toThrow();
+    const result = runAudit(input);
+    expect(result.totalMonthlySavings).toBe(0);
+  });
 });
