@@ -5,13 +5,11 @@ import { runAudit } from '@/lib/auditEngine';
 import { auditInputSchema } from '@/lib/schema';
 import { AuditInput } from '@/types';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!,
-);
-
 export async function POST(req: Request) {
   try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+    const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
     const body = await req.json();
 
     // 1. Validate input
@@ -42,7 +40,7 @@ export async function POST(req: Request) {
 
     if (process.env.GEMINI_API_KEY) {
       try {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
         const geminiRes = await fetch(geminiUrl, {
           method: 'POST',
@@ -83,18 +81,22 @@ export async function POST(req: Request) {
     // 5. Generate ID and save to Supabase
     const id = nanoid(10);
 
-    const { error } = await supabase.from('audits').insert({
-      id,
-      input,
-      recommendations: result.recommendations,
-      total_monthly_savings: result.totalMonthlySavings,
-      total_annual_savings: result.totalAnnualSavings,
-      summary,
-    });
+    if (supabase) {
+      const { error } = await supabase.from('audits').insert({
+        id,
+        input,
+        recommendations: result.recommendations,
+        total_monthly_savings: result.totalMonthlySavings,
+        total_annual_savings: result.totalAnnualSavings,
+        summary,
+      });
 
-    if (error) {
-      console.error('Supabase Insert Error:', error);
-      // Still return the result — don't crash
+      if (error) {
+        console.error('Supabase Insert Error:', error);
+        // Still return the result — don't crash
+      }
+    } else {
+      console.warn('Supabase env vars missing, skipping insert');
     }
 
     // 6. Return result

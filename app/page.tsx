@@ -111,6 +111,17 @@ export default function AuditFormPage() {
 
   if (!isClient) return null; // Prevent hydration mismatch
 
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="bg-red-50 text-red-600 p-6 rounded-lg text-center max-w-md border border-red-200">
+          <h2 className="text-xl font-semibold mb-2">Configuration Error</h2>
+          <p>The application is missing required environment variables (NEXT_PUBLIC_SUPABASE_URL). Please check your deployment settings.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-3xl">

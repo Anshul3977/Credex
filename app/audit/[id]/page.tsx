@@ -45,16 +45,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function AuditResultsRoute({ params }: Props) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/audit/${params.id}`, {
-    cache: 'no-store',
-  });
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/audit/${params.id}`, {
+      cache: 'no-store',
+    });
 
-  if (!res.ok) {
+    if (!res.ok) {
+      redirect('/');
+    }
+
+    const data = await res.json();
+    const result = data.result;
+
+    if (!result) {
+      redirect('/');
+    }
+
+    return <ResultsPage audit={result} />;
+  } catch (e) {
     redirect('/');
   }
-
-  const result = await res.json();
-
-  return <ResultsPage audit={result} />;
 }
