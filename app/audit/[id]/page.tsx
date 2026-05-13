@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Audit Not Found — SpendLens' };
   }
 
-  const result = data.result;
+  const result = data;
   const savings = result.totalMonthlySavings;
   const title = `I could save $${savings}/month on AI — SpendLens`;
   const description = (result.summary || '').slice(0, 120);
@@ -56,9 +56,10 @@ export default async function AuditResultsRoute({ params }: Props) {
     }
 
     const data = await res.json();
-    const result = data.result;
+    console.log('API response:', JSON.stringify(data));
+    const result = data;
 
-    if (!result) {
+    if (!result || !result.totalMonthlySavings && result.totalMonthlySavings !== 0) {
       redirect('/');
     }
 
