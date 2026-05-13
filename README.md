@@ -5,7 +5,7 @@ to audit their AI tool spending, identify overspend, and get actionable
 recommendations. Built as a lead-generation asset for Credex, which sells 
 discounted AI infrastructure credits.
 
-**Live:** [your-url-here]
+**Live:** https://credex-kappa-one.vercel.app/
 
 ## Screenshots
 
